@@ -75,7 +75,7 @@ namespace ExemploCRUD {
                 comandos.CommandText = "delete from Categorias where idCategoria=@vi";
                 comandos.Parameters.AddWithValue ("@vi", cat.IdCategoria);
 
-                int r = comandos.ExecuteNonQuery ();//retorna valor numérico, não traz dado. retorna quantidade de comandos executados.
+                int r = comandos.ExecuteNonQuery (); //retorna valor numérico, não traz dado. retorna quantidade de comandos executados.
 
                 if (r > 0)
                     rs = true;
@@ -90,23 +90,37 @@ namespace ExemploCRUD {
             }
             return rs;
         }
-        public List<Categoria> ListarCategorias(int id){
-            List<Categoria> lista = new List<Categoria>();
-            try{
-                cn = new SqlConnection();
+        public List<Categoria> ListarCategorias (int id) {
+            List<Categoria> lista = new List<Categoria> ();
+            try {
+                cn = new SqlConnection ();
                 cn.ConnectionString = @"Data Source=.\sqlexpress;Initial Catalog=Papelaria;User id=sa;password=senai@123";
-                cn.Open();
-                comandos = new SqlCommand();
+                cn.Open ();
+                comandos = new SqlCommand ();
                 comandos.Connection = cn;
                 comandos.CommandType = CommandType.Text;
-                comandos.CommandText="Select * from Categorias where idCategoria=@vi";
-                comandos.Parameters.AddWithValue("@vi",id);
-                rd = comandos.ExecuteReader();//é um leitor de dados (data reader).
+                comandos.CommandText = "Select * from Categorias where idCategoria=@vi";
+                comandos.Parameters.AddWithValue ("@vi", id);
+                rd = comandos.ExecuteReader (); //é um leitor de dados (data reader).
 
-                while(rd.Read()){
-                    lista.Add(new Categoria{IdCategoria=rd.GetInt32(0),Titulo=rd.GetString(1)});
+                while (rd.Read ()) { //enquando houver possibilidade de ler conteúdo dentro de rd
+                    lista.Add (new Categoria { IdCategoria = rd.GetInt32 (0), Titulo = rd.GetString (1) }); //será criada uma lista e será adicionada uma nova categoria anônima, e será colocada dentro dos parâmetros. tem que colocar new categoria para tipar, e foi criado dentro do laço.
+                    //poderia ser também da seguinte maneira
+                    // Categoria ct = new Categoria(){
+                    //     IdCategoria=rd.GetInt32(0),
+                    //     Titulo=rd.GetString(1)};
+                    //    lista.Add(ct);
                 }
+                comandos.Parameters.Clear ();
+            } catch (SqlException se) {
+                throw new Exception ("Erro ao tentar listar. " + se.Message);
+            } catch (Exception ex) {
+                throw new Exception ("Erro inesperado. " + ex.Message);
+            } finally {
+                cn.Close ();
             }
+            return lista;
+
         }
     }
 }
