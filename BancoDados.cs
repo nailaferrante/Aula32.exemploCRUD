@@ -120,6 +120,37 @@ namespace ExemploCRUD {
                 cn.Close ();
             }
             return lista;
+        }
+        public List<Categoria> ListarCategorias (string titulo) {
+            List<Categoria> lista = new List<Categoria> ();
+            try {
+                cn = new SqlConnection ();
+                cn.ConnectionString = @"Data Source=.\sqlexpress;Initial Catalog=Papelaria;User id=sa;password=senai@123";
+                cn.Open ();
+                comandos = new SqlCommand ();
+                comandos.Connection = cn;
+                comandos.CommandType = CommandType.Text;
+                comandos.CommandText = "Select * from Categorias where titulo like @vi";
+                comandos.Parameters.AddWithValue ("@vi", titulo);
+                rd = comandos.ExecuteReader (); //é um leitor de dados (data reader).
+
+                while (rd.Read ()) { //enquando houver possibilidade de ler conteúdo dentro de rd
+                    lista.Add (new Categoria { IdCategoria = rd.GetInt32 (0), Titulo = rd.GetString (1) }); //será criada uma lista e será adicionada uma nova categoria anônima, e será colocada dentro dos parâmetros. tem que colocar new categoria para tipar, e foi criado dentro do laço.
+                    //poderia ser também da seguinte maneira
+                    // Categoria ct = new Categoria(){
+                    //     IdCategoria=rd.GetInt32(0),
+                    //     Titulo=rd.GetString(1)};
+                    //    lista.Add(ct);
+                }
+                comandos.Parameters.Clear ();
+            } catch (SqlException se) {
+                throw new Exception ("Erro ao tentar listar. " + se.Message);
+            } catch (Exception ex) {
+                throw new Exception ("Erro inesperado. " + ex.Message);
+            } finally {
+                cn.Close ();
+            }
+            return lista;
 
         }
     }
