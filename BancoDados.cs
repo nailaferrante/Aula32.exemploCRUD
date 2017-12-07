@@ -153,5 +153,46 @@ namespace ExemploCRUD {
             return lista;
 
         }
+
+        public bool AdicionarCliente (Cliente cliente){
+            bool rs = false;
+            try{//vamos tentar inserir os dados na tabela
+            cn = new SqlConnection(); // classe que ajuda a comunicação com o servidor
+            cn.ConnectionString=@"Data Source=.\sqlexpress;initial catalog=Papelaria;user id=sa;password=senai@123";//temos que dizer o caminho login e senha para conectar//se estiver em outro computador que não o local precisamos saber o ip em vez do .\ .
+            cn.Open();
+            comandos = new SqlCommand();
+            comandos.Connection = cn;//o banco neste caso é o cn
+            comandos.CommandType = CommandType.StoredProcedure;
+            comandos.CommandText = "sp_CadCliente";//informar o procedure
+
+            SqlParameter pnome = new SqlParameter("@nome",SqlDbType.VarChar,50);//os parametros do procedure estão em "formato" sql, portanto precisamos "traduzir" para C# //tipo de dados do banco de dados = SqlDbType.
+            pnome.Value = cliente.NomeCliente; //pnome é a representação do @nome no SQL, o .Value está adcionando valor ao NomeCLiente da classe Cliente
+            comandos.Parameters.Add(pnome);//adicionado ao parâmetro.
+            
+            SqlParameter pemail = new SqlParameter("@email",SqlDbType.VarChar,100);
+            pemail.Value = cliente.EmailCliente;
+            comandos.Parameters.Add(pemail);
+
+            SqlParameter pcpf = new SqlParameter("@cpf",SqlDbType.VarChar,20);
+            pcpf.Value = cliente.CPFCliente;
+            comandos.Parameters.Add(pcpf);
+
+            int r = comandos.ExecuteNonQuery();
+            if(r>1)
+                rs = true;
+                
+            comandos.Parameters.Clear();
+            }
+            catch(SqlException se){
+                throw new Exception("Erro ao tentar inserir os dados"+se.Message);
+            }
+            catch(Exception ex){
+                throw new Exception("Erro inesperado"+ex.Message);
+            }
+            finally {
+                cn.Close();
+            }
+            return rs;
+        }
     }
 }
