@@ -178,7 +178,7 @@ namespace ExemploCRUD {
             comandos.Parameters.Add(pcpf);
 
             int r = comandos.ExecuteNonQuery();
-            if(r>1)
+            if(r>0)
                 rs = true;
                 
             comandos.Parameters.Clear();
